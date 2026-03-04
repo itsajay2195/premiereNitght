@@ -11,9 +11,21 @@ import WatchlistScreen from '../screens/WatchlistScreen/WatchlistScreen';
 import DetailsScreen from '../screens/DetailsScreen/DetailsScreen';
 import { Colors } from '../theme/theme';
 import { Text } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Stack = createNativeStackNavigator<any>(); //add types
 const Tab = createBottomTabNavigator<any>(); //add types
+
+const getTabIcon = (routeName: string, focused: boolean) => {
+  switch (routeName) {
+    case HOME_SCREEN:
+      return focused ? 'movie-open' : 'movie-open-outline';
+    case WATCHLIST_SCREEN:
+      return focused ? 'bookmark' : 'bookmark-outline';
+    default:
+      return 'circle';
+  }
+};
 
 function TabNavigator() {
   return (
@@ -32,14 +44,13 @@ function TabNavigator() {
           fontWeight: '600',
           letterSpacing: 0.5,
         },
-        tabBarIcon: ({ focused }) => {
-          const icon = route.name === 'Home' ? '🎬' : '🎞';
-          return (
-            <Text style={{ fontSize: 18, opacity: focused ? 1 : 0.5 }}>
-              {icon}
-            </Text>
-          );
-        },
+        tabBarIcon: ({ focused, color }) => (
+          <MaterialCommunityIcons
+            name={getTabIcon(route.name, focused)}
+            size={24}
+            color={color}
+          />
+        ),
       })}
     >
       <Tab.Screen
