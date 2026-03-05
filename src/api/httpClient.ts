@@ -1,6 +1,7 @@
+import { TMDB_API_KEY } from '../../config';
 import { BASE_URL } from '../constants/apiConstants';
 
-const API_KEY = '';
+const API_KEY = TMDB_API_KEY;
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
@@ -13,11 +14,14 @@ export async function get<T>(
   endpoint: string,
   params: Record<string, string> = {},
 ): Promise<T> {
-  const url: any = new URL(`${BASE_URL}${endpoint}`);
-  url.searchParams.set('api_key', API_KEY);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const queryParams = new URLSearchParams({
+    api_key: API_KEY,
+    ...params,
+  }).toString();
 
-  const res = await fetch(url.toString());
+  const url = `${BASE_URL}${endpoint}?${queryParams}`;
+
+  const res = await fetch(url);
 
   if (!res.ok) {
     throw new ApiError(res.status, `TMDb error ${res.status}: ${endpoint}`);
