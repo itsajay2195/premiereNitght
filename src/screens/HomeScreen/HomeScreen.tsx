@@ -5,7 +5,6 @@ import {
   StyleSheet,
   RefreshControl,
   StatusBar,
-  Text,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Genre, Movie } from '../../api/types/movie';
@@ -15,6 +14,7 @@ import { Colors, Spacing } from '../../theme/theme';
 import { AppFlatList } from '../../components/AppFlatlist/AppFlatList';
 import { SearchBar } from '../../components/Searchbar/Searchbar';
 import { MovieCard } from './components/MovieCard';
+import { GenreFilter } from './components/GenreFilter';
 
 function HomeScreen() {
   const navigation = useNavigation<any>();
@@ -125,6 +125,15 @@ function HomeScreen() {
           <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
         </View>
 
+        {!isSearching && (
+          <View style={styles.genreContainer}>
+            <GenreFilter
+              genres={genres}
+              selected={selectedGenre}
+              onSelect={setSelectedGenre}
+            />
+          </View>
+        )}
         {/* Search Results */}
         {isSearching && (
           <View style={styles.section}>
