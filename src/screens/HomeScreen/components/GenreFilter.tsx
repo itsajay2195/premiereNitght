@@ -1,8 +1,9 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet } from 'react-native';
 import { Genre } from '../../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../../theme/theme';
 import { AppFlatList } from '../../../components/AppFlatlist/AppFlatList';
+import { Pill } from '../../../components/Pill/Pill';
 
 interface Props {
   genres: Genre[];
@@ -15,14 +16,9 @@ const ALL_PILL: Genre = { id: -1, name: 'All' };
 export function GenreFilter({ genres, selected, onSelect }: Props) {
   const data = [ALL_PILL, ...genres];
 
-  return (
-    <AppFlatList
-      horizontal
-      data={data}
-      keyExtractor={item => String(item.id)}
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
-      renderItem={({ item }) => (
+  const renderItem = useCallback(
+    ({ item }: any) => {
+      return (
         <Pill
           label={item.name}
           active={item.id === -1 ? selected === null : selected === item.id}
@@ -34,30 +30,20 @@ export function GenreFilter({ genres, selected, onSelect }: Props) {
             }
           }}
         />
-      )}
-    />
+      );
+    },
+    [onSelect, selected],
   );
-}
 
-function Pill({
-  label,
-  active,
-  onPress,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-}) {
   return (
-    <TouchableOpacity
-      style={[styles.pill, active && styles.pillActive]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Text style={[styles.pillText, active && styles.pillTextActive]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
+    <AppFlatList
+      horizontal
+      data={data}
+      keyExtractor={item => String(item.id)}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+      renderItem={renderItem}
+    />
   );
 }
 
