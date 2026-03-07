@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
 import { AppNavigator } from './Appnavigator';
+import ErrorBoundary from '../hoc/ErrorBoundary';
 
 const RootNavigation = () => {
   return (
@@ -14,7 +15,9 @@ const RootNavigation = () => {
             keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 20}
             style={styles.flex1}
           >
-            <AppNavigator />
+            <ErrorBoundary>
+              <AppNavigator />
+            </ErrorBoundary>
           </KeyboardAvoidingView>
         </SafeAreaView>
       </SafeAreaProvider>
