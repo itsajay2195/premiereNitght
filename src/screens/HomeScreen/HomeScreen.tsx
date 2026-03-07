@@ -32,9 +32,6 @@ function HomeScreen() {
   const [searching, setSearching] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    throw new Error('game over');
-  }, []);
   const loadHome = useCallback(async () => {
     try {
       setIsError(false);

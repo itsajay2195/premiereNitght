@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import {
   View,
-  Text,
   FlatList,
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +14,7 @@ import { Movie } from '../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../theme/theme';
 import { getPosterUrl } from '../../utils/imageUtils';
 import { DETAILS_SCREEN } from '../../constants/screenConstants';
+import { Typography } from '../../components/Typography/Typography';
 
 type Nav = NativeStackNavigationProp<any>;
 
@@ -46,19 +46,25 @@ export default function WatchlistScreen() {
       <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.logo}>WATCHLIST</Text>
-          <Text style={styles.count}>
+          <Typography variant="heading">WATCHLIST</Typography>
+          <Typography variant="caption" color={Colors.textMuted}>
             {items.length} {items.length === 1 ? 'film' : 'films'}
-          </Text>
+          </Typography>
         </View>
         {items.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>🎬</Text>
-            <Text style={styles.emptyTitle}>Your watchlist is empty</Text>
-            <Text style={styles.emptySubtitle}>
+            <Typography variant="heading">🎬</Typography>
+            <Typography variant="title" style={styles.emptyTitle}>
+              Your watchlist is empty
+            </Typography>
+            <Typography
+              variant="body"
+              color={Colors.textMuted}
+              style={styles.emptySubtitle}
+            >
               Add films from the home screen to curate your premiere night
               lineup.
-            </Text>
+            </Typography>
           </View>
         ) : (
           <FlatList
@@ -92,18 +98,20 @@ function WatchlistRow({
         <Image source={{ uri }} style={styles.thumb} resizeMode="cover" />
       ) : (
         <View style={[styles.thumb, styles.thumbPlaceholder]}>
-          <Text style={{ color: Colors.textMuted }}>{movie.title[0]}</Text>
+          <Typography variant="caption" color={Colors.textMuted}>
+            {movie.title[0]}
+          </Typography>
         </View>
       )}
       <View style={styles.rowInfo}>
-        <Text style={styles.rowTitle} numberOfLines={2}>
+        <Typography variant="title" numberOfLines={2}>
           {movie.title}
-        </Text>
-        {year ? <Text style={styles.rowYear}>{year}</Text> : null}
+        </Typography>
+        {year ? <Typography variant="caption">{year}</Typography> : null}
         {movie.vote_average > 0 && (
-          <Text style={styles.rowRating}>
-            * {movie.vote_average.toFixed(1)}
-          </Text>
+          <Typography variant="caption" color={Colors.accent}>
+            ★ {movie.vote_average.toFixed(1)}
+          </Typography>
         )}
       </View>
       <TouchableOpacity
@@ -111,7 +119,9 @@ function WatchlistRow({
         onPress={onRemove}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       >
-        <Text style={styles.removeBtnText}>Remove</Text>
+        <Typography variant="caption" color={Colors.danger}>
+          Remove
+        </Typography>
       </TouchableOpacity>
     </TouchableOpacity>
   );

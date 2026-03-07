@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Colors, Radius, Spacing } from '../../theme/theme';
+import { Typography } from '../Typography/Typography';
 
 interface PillProps {
   label: string;
@@ -33,15 +34,13 @@ export function Pill({
       ]}
       {...containerProps}
     >
-      <Text
-        style={[
-          styles.label,
-          isActive ? styles.activeLabelText : styles.defaultLabelText,
-          color ? { color } : null,
-        ]}
+      <Typography
+        variant="caption"
+        color={isActive ? Colors.background : color ?? Colors.textMuted}
+        style={styles.label}
       >
         {label}
-      </Text>
+      </Typography>
     </Container>
   );
 }

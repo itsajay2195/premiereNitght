@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { getPosterUrl } from '../../../utils/imageUtils';
 import { Movie } from '../../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../../theme/theme';
+import { Typography } from '../../../components/Typography/Typography';
 
 const CARD_WIDTH = 140;
 const CARD_HEIGHT = 210;
@@ -29,15 +30,19 @@ export function MovieCard({ movie, onPress, size = 'md' }: Props) {
         <Image source={{ uri }} style={styles.poster} resizeMode="cover" />
       ) : (
         <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>{movie.title[0]}</Text>
+          <Typography variant="heading" color={Colors.textMuted}>
+            {movie.title[0]}
+          </Typography>
         </View>
       )}
       <View style={styles.overlay}>
-        <Text style={styles.title} numberOfLines={2}>
+        <Typography variant="title" numberOfLines={2}>
           {movie.title}
-        </Text>
+        </Typography>
         {movie.vote_average > 0 && (
-          <Text style={styles.rating}>★ {movie.vote_average.toFixed(1)}</Text>
+          <Typography variant="caption" color={Colors.accent}>
+            ★ {movie.vote_average.toFixed(1)}
+          </Typography>
         )}
       </View>
     </TouchableOpacity>

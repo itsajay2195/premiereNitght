@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
-  Text,
   Image,
   ScrollView,
   StyleSheet,
@@ -19,6 +18,7 @@ import { movieApi } from '../../api/movieApi';
 import { useWatchlistStore } from '../../store/watchlistStore';
 import { Pill } from '../../components/Pill/Pill';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Typography } from '../../components/Typography/Typography';
 
 type Route = RouteProp<any, 'Detail'>; // should repace wth apt. types
 type Nav = NativeStackNavigationProp<any>; // should repace wth apt. types
@@ -63,7 +63,9 @@ export default function DetailScreen() {
   if (!movie) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>unable to load.</Text>
+        <Typography variant="body" color={Colors.danger}>
+          Unable to load.
+        </Typography>
       </View>
     );
   }
@@ -120,16 +122,22 @@ export default function DetailScreen() {
                 />
               ) : (
                 <View style={[styles.poster, styles.posterPlaceholder]}>
-                  <Text style={{ color: Colors.textMuted, fontSize: 32 }}>
+                  <Typography variant="heading" color={Colors.textMuted}>
                     {movie.title[0]}
-                  </Text>
+                  </Typography>
                 </View>
               )}
             </View>
             <View style={styles.titleBlock}>
-              <Text style={styles.title}>{movie.title}</Text>
+              <Typography variant="title">{movie.title}</Typography>
               {movie.tagline ? (
-                <Text style={styles.tagline}>{movie.tagline}</Text>
+                <Typography
+                  variant="body"
+                  color={Colors.textMuted}
+                  style={styles.tagline}
+                >
+                  {movie.tagline}
+                </Typography>
               ) : null}
               <View style={styles.metaRow}>
                 {year && <Pill label={year} variant="outlined" />}
@@ -157,8 +165,10 @@ export default function DetailScreen() {
           {/* Synopsis */}
           {movie.overview ? (
             <View style={styles.synopsisBlock}>
-              <Text style={styles.synopsisLabel}>SYNOPSIS</Text>
-              <Text style={styles.synopsis}>{movie.overview}</Text>
+              <Typography variant="caption" color={Colors.textFaint}>
+                SYNOPSIS
+              </Typography>
+              <Typography variant="body">{movie.overview}</Typography>
             </View>
           ) : null}
 
@@ -171,14 +181,15 @@ export default function DetailScreen() {
             onPress={toggleWatchlist}
             activeOpacity={0.8}
           >
-            <Text
+            <Typography
+              variant="caption"
               style={[
                 styles.watchlistBtnText,
                 inWatchlist && styles.watchlistBtnTextActive,
               ]}
             >
               {inWatchlist ? '✓  In Watchlist' : '+  Add to Watchlist'}
-            </Text>
+            </Typography>
           </TouchableOpacity>
         </View>
       </ScrollView>
