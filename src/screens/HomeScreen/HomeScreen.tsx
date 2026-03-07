@@ -1,214 +1,108 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, StyleSheet, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Genre, Movie } from '../../api/types/movie';
-import { movieApi } from '../../api/movieApi';
+import { Movie } from '../../api/types/movie';
 import { Typography } from '../../components/Typography';
 import { Colors, Spacing } from '../../theme/theme';
 import { AppFlatList } from '../../components/AppFlatlist/AppFlatList';
-import { SearchBar } from '../../components/Searchbar/Searchbar';
 import { MovieCard } from './components/MovieCard';
-import { GenreFilter } from './components/GenreFilter';
-import { DETAILS_SCREEN } from '../../constants/screenConstants';
+import ListHeader from './components/ListHeader';
+import { useHomeScreen } from './state/useHomescreen';
+import { buildSections } from './state/buildSections';
+import { Section } from './type';
 
 function HomeScreen() {
   const navigation = useNavigation<any>();
+  const { state, onRefresh, setSearchQuery, setSelectedGenre } =
+    useHomeScreen();
 
-  const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
-  const [popular, setPopular] = useState<Movie[]>([]);
-  const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
-  const [genreMovies, setGenreMovies] = useState<Movie[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [searching, setSearching] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const {
+    nowPlaying,
+    popular,
+    genres,
+    genreMovies,
+    searchResults,
+    selectedGenre,
+    searchQuery,
+    loading,
+    searching,
+    refreshing,
+    isError,
+  } = state;
 
-  const loadHome = useCallback(async () => {
-    try {
-      setIsError(false);
-      const [np, pop, gen] = await Promise.all([
-        movieApi.nowPlaying(),
-        movieApi.popular(),
-        movieApi.genres(),
-      ]);
-
-      setNowPlaying(np.results.slice(0, 15));
-      setPopular(pop.results.slice(0, 15));
-      setGenres(gen.genres);
-    } catch (e) {
-      setIsError(true);
-      console.error(e);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadHome();
-  }, [loadHome]);
-
-  useEffect(() => {
-    if (!selectedGenre) {
-      setGenreMovies([]);
-      return;
-    }
-    movieApi
-      .discover(selectedGenre)
-      .then(r => setGenreMovies(r.results.slice(0, 15)));
-  }, [selectedGenre]);
-
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    const timer = setTimeout(async () => {
-      setSearching(true);
-      try {
-        const r = await movieApi.search(searchQuery.trim());
-        setSearchResults(r.results);
-      } finally {
-        setSearching(false);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const goToDetail = (movie: Movie) => {
-    navigation.navigate(DETAILS_SCREEN, { movieId: movie.id, movie });
-  };
-
-  const isSearching = searchQuery.trim().length > 0;
+  const isSearching = searchQuery?.trim().length > 0;
   const showGenreResults = !!selectedGenre && !isSearching;
+
+  const goToDetail = useCallback(
+    (movie: Movie) =>
+      navigation.navigate('Detail', { movieId: movie.id, movie }),
+    [navigation],
+  );
+
+  const sections = buildSections({
+    isSearching,
+    showGenreResults,
+    searchQuery,
+    searching,
+    searchResults,
+    genres,
+    selectedGenre,
+    genreMovies,
+    nowPlaying,
+    popular,
+    loading,
+    isError,
+  });
+
+  const renderSection = useCallback(
+    ({ item: section }: { item: Section }) => (
+      <View style={styles.section}>
+        <Typography variant="caption" style={styles.sectionTitle}>
+          {section.title}
+        </Typography>
+        <AppFlatList
+          horizontal={section.orientation === 'horizontal'}
+          data={section.data}
+          keyExtractor={(item: any) => String(item.id)}
+          contentContainerStyle={styles.row}
+          renderItem={({ item }: { item: Movie }) => (
+            <MovieCard movie={item} onPress={goToDetail} size={section.size} />
+          )}
+          isLoading={section.isLoading}
+          isError={section.isError}
+          emptyMessage={section.emptyMessage}
+        />
+      </View>
+    ),
+    [goToDetail],
+  );
 
   return (
     <View style={styles.safe}>
-      <ScrollView
-        style={styles.container}
+      <AppFlatList
+        data={sections}
+        keyExtractor={item => item.id}
+        renderItem={renderSection}
+        ListHeaderComponent={
+          <ListHeader
+            searchQuery={searchQuery}
+            genres={genres}
+            selectedGenre={selectedGenre}
+            isSearching={isSearching}
+            onChangeText={setSearchQuery}
+            onSelectGenre={setSelectedGenre}
+          />
+        }
+        ListFooterComponent={<View style={{ height: 40 }} />}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={() => {
-              setRefreshing(true);
-              loadHome();
-            }}
+            onRefresh={onRefresh}
             tintColor={Colors.accent}
           />
         }
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Typography variant="heading">PREMIERE</Typography>
-          <Typography
-            variant="caption"
-            color={Colors.accent}
-            style={styles.logoSub}
-          >
-            NIGHT
-          </Typography>
-        </View>
-
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
-        </View>
-
-        {!isSearching && (
-          <View style={styles.genreContainer}>
-            <GenreFilter
-              genres={genres}
-              selected={selectedGenre}
-              onSelect={setSelectedGenre}
-            />
-          </View>
-        )}
-        {/* Search Results */}
-        {isSearching && (
-          <View style={styles.section}>
-            <Typography variant="caption" style={styles.sectionTitle}>
-              {searching ? 'Searching...' : `Results for "${searchQuery}"`}
-            </Typography>
-            <AppFlatList
-              horizontal
-              data={searchResults}
-              keyExtractor={item => String(item.id)}
-              contentContainerStyle={styles.row}
-              renderItem={({ item }) => (
-                <MovieCard movie={item} onPress={goToDetail} size="md" />
-              )}
-              isLoading={searching}
-              emptyMessage="No films found."
-            />
-          </View>
-        )}
-
-        {/* Genre Results */}
-        {showGenreResults && (
-          <View style={styles.section}>
-            <Typography variant="caption" style={styles.sectionTitle}>
-              {genres.find(g => g.id === selectedGenre)?.name}
-            </Typography>
-            <AppFlatList
-              horizontal
-              data={genreMovies}
-              keyExtractor={item => String(item.id)}
-              contentContainerStyle={styles.row}
-              renderItem={({ item }) => (
-                <MovieCard movie={item} onPress={goToDetail} size="md" />
-              )}
-            />
-          </View>
-        )}
-
-        {/* Now Playing */}
-        {!isSearching && (
-          <View style={styles.section}>
-            <Typography variant="caption" style={styles.sectionTitle}>
-              Now Playing
-            </Typography>
-            <AppFlatList
-              horizontal
-              data={nowPlaying}
-              keyExtractor={item => String(item.id)}
-              contentContainerStyle={styles.row}
-              renderItem={({ item }) => (
-                <MovieCard movie={item} onPress={goToDetail} size="md" />
-              )}
-              isLoading={loading}
-              isError={isError}
-              errorMessage="Failed to load films."
-            />
-          </View>
-        )}
-
-        {/* Popular */}
-        {!isSearching && (
-          <View style={styles.section}>
-            <Typography variant="caption" style={styles.sectionTitle}>
-              Popular
-            </Typography>
-            <AppFlatList
-              horizontal
-              data={popular}
-              keyExtractor={item => String(item.id)}
-              contentContainerStyle={styles.row}
-              renderItem={({ item }) => (
-                <MovieCard movie={item} onPress={goToDetail} size="md" />
-              )}
-              isLoading={loading}
-              isError={isError}
-              errorMessage="Failed to load films."
-            />
-          </View>
-        )}
-
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      />
     </View>
   );
 }
