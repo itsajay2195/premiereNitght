@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -23,12 +22,27 @@ export default function WatchlistScreen() {
   const { items, remove } = useWatchlistStore();
   const navigation = useNavigation<Nav>();
 
-  const goToDetail = (movie: Movie) => {
-    navigation.navigate(DETAILS_SCREEN, { movieId: movie.id, movie });
-  };
+  const goToDetail = useCallback(
+    (movie: Movie) => {
+      navigation.navigate(DETAILS_SCREEN, { movieId: movie.id, movie });
+    },
+    [navigation],
+  );
 
+  const renderItem = useCallback(
+    ({ item }: any) => {
+      return (
+        <WatchlistRow
+          movie={item}
+          onPress={() => goToDetail(item)}
+          onRemove={() => remove(item.id)}
+        />
+      );
+    },
+    [goToDetail, remove],
+  );
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.safe}>
       <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
       <View style={styles.container}>
         <View style={styles.header}>
@@ -52,18 +66,12 @@ export default function WatchlistScreen() {
             keyExtractor={item => String(item.id)}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <WatchlistRow
-                movie={item}
-                onPress={() => goToDetail(item)}
-                onRemove={() => remove(item.id)}
-              />
-            )}
+            renderItem={renderItem}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
           />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
