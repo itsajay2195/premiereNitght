@@ -54,7 +54,13 @@ export default function DetailScreen() {
     else add(movie);
   }, [movie, inWatchlist, add, remove]);
 
-  const goBack = useCallback(() => navigation.goBack(), [navigation]);
+  const goBack = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('Main'); // fallback for deep link entry
+    }
+  }, [navigation]);
 
   if (loading && !movie) {
     return (

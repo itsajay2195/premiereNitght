@@ -4,7 +4,7 @@ import {
   StatusBar,
   StyleSheet,
 } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
 import { AppNavigator } from './Appnavigator';
@@ -12,10 +12,30 @@ import ErrorBoundary from '../hoc/ErrorBoundary';
 import { Colors } from '../theme/theme';
 import Toast from 'react-native-toast-message';
 import NetworkBanner from '../hoc/NetworkBanner';
+import {
+  DETAILS_SCREEN,
+  HOME_SCREEN,
+  WATCHLIST_SCREEN,
+} from '../constants/screenConstants';
+
+const linking: LinkingOptions<any> = {
+  prefixes: ['premierenight://'],
+  config: {
+    screens: {
+      Main: {
+        screens: {
+          [HOME_SCREEN]: 'home',
+          [WATCHLIST_SCREEN]: 'watchlist',
+        },
+      },
+      [DETAILS_SCREEN]: 'movie/:movieId',
+    },
+  },
+};
 
 const RootNavigation = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <SafeAreaProvider>
         <SafeAreaView style={styles.container}>
           <StatusBar
