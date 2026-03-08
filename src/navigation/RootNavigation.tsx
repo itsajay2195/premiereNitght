@@ -11,6 +11,7 @@ import { AppNavigator } from './Appnavigator';
 import ErrorBoundary from '../hoc/ErrorBoundary';
 import { Colors } from '../theme/theme';
 import Toast from 'react-native-toast-message';
+import NetworkBanner from '../hoc/NetworkBanner';
 
 const RootNavigation = () => {
   return (
@@ -30,6 +31,7 @@ const RootNavigation = () => {
               <AppNavigator />
             </ErrorBoundary>
           </KeyboardAvoidingView>
+          <NetworkBanner />
           <Toast />
         </SafeAreaView>
       </SafeAreaProvider>
