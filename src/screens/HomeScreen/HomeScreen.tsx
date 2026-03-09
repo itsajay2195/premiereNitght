@@ -6,12 +6,12 @@ import { Typography } from '../../components/Typography';
 import { Colors, Spacing } from '../../theme/theme';
 import { MovieCard } from './components/MovieCard';
 import ListHeader from './components/ListHeader';
-import { useHomeScreen } from './state/useHomeScreen';
 import { buildSections } from './state/buildSections';
 import type { Section } from './type';
 import { DETAILS_SCREEN } from '../../constants/screens';
 import { AppFlatList } from '../../components/AppFlatList';
 import type { RootStackNavigationProp } from '../../navigation/types';
+import { useHomeScreen } from './state/useHomescreen';
 
 function HomeScreen() {
   const navigation = useNavigation<RootStackNavigationProp>();
