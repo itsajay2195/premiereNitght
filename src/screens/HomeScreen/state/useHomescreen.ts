@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
 import { movieApi } from '../../../api/movieApi';
 import { Movie, Genre } from '../../../api/types/movie';
-import { showToast } from '../../../utils/toas';
+import { showToast } from '../../../utils/toast';
 
 interface HomeState {
   nowPlaying: Movie[];

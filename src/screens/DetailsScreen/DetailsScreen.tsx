@@ -18,8 +18,7 @@ import { useWatchlistStore } from '../../store/watchlistStore';
 import { Pill } from '../../components/Pill/Pill';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Typography } from '../../components/Typography/Typography';
-import { showToast } from '../../utils/toas';
-
+import { showToast } from '../../utils/toast';
 type Route = RouteProp<any, 'Detail'>; // should repace wth apt. types
 type Nav = NativeStackNavigationProp<any>; // should repace wth apt. types
 
