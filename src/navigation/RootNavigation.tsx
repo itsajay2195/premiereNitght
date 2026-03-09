@@ -13,6 +13,7 @@ import Toast from 'react-native-toast-message';
 import {
   DETAILS_SCREEN,
   HOME_SCREEN,
+  MAIN_SCREEN,
   WATCHLIST_SCREEN,
 } from '../constants/screens';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -22,7 +23,7 @@ const linking: LinkingOptions<any> = {
   prefixes: ['premierenight://'],
   config: {
     screens: {
-      Main: {
+      [MAIN_SCREEN]: {
         screens: {
           [HOME_SCREEN]: 'home',
           [WATCHLIST_SCREEN]: 'watchlist',

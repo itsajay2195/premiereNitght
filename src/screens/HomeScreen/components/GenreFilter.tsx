@@ -17,7 +17,7 @@ export function GenreFilter({ genres, selected, onSelect }: Props) {
   const data = [ALL_PILL, ...genres];
 
   const renderItem = useCallback(
-    ({ item }: any) => {
+    ({ item }: { item: Genre }) => {
       return (
         <Pill
           label={item.name}

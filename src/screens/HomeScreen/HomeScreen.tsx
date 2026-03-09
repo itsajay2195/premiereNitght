@@ -64,7 +64,7 @@ function HomeScreen() {
         <AppFlatList
           horizontal={section.orientation === 'horizontal'}
           data={section.data}
-          keyExtractor={(item: any) => String(item.id)}
+          keyExtractor={item => String(item?.id)}
           contentContainerStyle={styles.row}
           renderItem={({ item }: { item: Movie }) => (
             <MovieCard movie={item} onPress={goToDetail} size={section.size} />

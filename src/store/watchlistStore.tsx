@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { createMMKV } from 'react-native-mmkv';
+import { createMMKV, MMKV } from 'react-native-mmkv';
 import { Movie } from '../api/types/movie';
 
-const storage: any = createMMKV({ id: 'premiere-watchlist' });
+const storage: MMKV = createMMKV({ id: 'premiere-watchlist' });
 
 const mmkvAdapter = {
   getItem: (key: string) => {
@@ -14,7 +14,7 @@ const mmkvAdapter = {
     storage.set(key, value);
   },
   removeItem: (key: string) => {
-    storage.delete(key);
+    storage.remove(key);
   },
 };
 

@@ -9,7 +9,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Movie } from '../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../theme/theme';
 import { getBackdropUrl, getPosterUrl } from '../../utils/image';
@@ -19,14 +18,20 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { showToast } from '../../utils/toast';
 import { Typography } from '../../components/Typography';
 import { Pill } from '../../components/Pill';
-type Route = RouteProp<any, 'Detail'>; // should repace wth apt. types
-type Nav = NativeStackNavigationProp<any>; // should repace wth apt. types
-
+import { DETAILS_SCREEN, MAIN_SCREEN } from '../../constants/screens';
+import {
+  RootStackNavigationProp,
+  RootStackParamList,
+} from '../../navigation/types';
+type DetailScreenRouteProp = RouteProp<
+  RootStackParamList,
+  typeof DETAILS_SCREEN
+>;
 const { width } = Dimensions.get('window');
 
 export default function DetailScreen() {
-  const route: any = useRoute<Route>();
-  const navigation = useNavigation<Nav>();
+  const route = useRoute<DetailScreenRouteProp>();
+  const navigation = useNavigation<RootStackNavigationProp>();
   const { movieId, movie: preloaded } = route.params;
 
   const [movie, setMovie] = useState<Movie | null>(preloaded ?? null);
@@ -57,7 +62,7 @@ export default function DetailScreen() {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate('Main'); // fallback for deep link entry
+      navigation.navigate(MAIN_SCREEN); // fallback for deep link entry
     }
   }, [navigation]);
 

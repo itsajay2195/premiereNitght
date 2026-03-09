@@ -29,7 +29,7 @@ export default function WatchlistScreen() {
   );
 
   const renderItem = useCallback(
-    ({ item }: any) => {
+    ({ item }: { item: Movie }) => {
       return (
         <WatchlistRow
           movie={item}
