@@ -8,7 +8,6 @@ import type { LinkingOptions } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
-import { AppNavigator } from './AppNavigator';
 import { Colors } from '../theme/theme';
 import Toast from 'react-native-toast-message';
 import {
@@ -20,6 +19,7 @@ import {
 import ErrorBoundary from '../components/ErrorBoundary';
 import NetworkBanner from '../components/NetworkBanner';
 import type { RootStackParamList } from './types';
+import { AppNavigator } from './Appnavigator';
 
 const linking: LinkingOptions<RootStackParamList> = {
   prefixes: ['premierenight://'],
