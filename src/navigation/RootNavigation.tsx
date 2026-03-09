@@ -7,7 +7,7 @@ import {
 import { LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
-import { AppNavigator } from './Appnavigator';
+import { AppNavigator } from './AppNavigator';
 import ErrorBoundary from '../hoc/ErrorBoundary';
 import { Colors } from '../theme/theme';
 import Toast from 'react-native-toast-message';

@@ -7,7 +7,7 @@ import { Colors, Spacing } from '../../theme/theme';
 import { AppFlatList } from '../../components/AppFlatlist/AppFlatList';
 import { MovieCard } from './components/MovieCard';
 import ListHeader from './components/ListHeader';
-import { useHomeScreen } from './state/useHomescreen';
+import { useHomeScreen } from './state/useHomeScreen';
 import { buildSections } from './state/buildSections';
 import { Section } from './type';
 import { DETAILS_SCREEN } from '../../constants/screenConstants';
