@@ -1,48 +1,30 @@
 # Première Night 🎬
 
-A cinematic film discovery app built for Mytheresa's private screening curation. Curators can browse now-playing and popular films, filter by genre, search the full TMDb catalogue, and maintain a persistent watchlist — all wrapped in a dark, editorial aesthetic.
+A film discovery app for Mytheresa's internal screening curation. Browse now-playing and popular titles, filter by genre, search the TMDb catalogue, and build a watchlist — all in a dark, editorial UI.
+
+[View on Appetize.io](https://appetize.io/app/b_4m5xnr74zil3yxngynw2rbtgda)
 
 ---
 
-## Prerequisites
+## Getting Started
 
-| Tool             | Version                           |
-| ---------------- | --------------------------------- |
-| Node.js          | 20+                               |
-| JDK              | 17+                               |
-| Android Studio   | Latest (for emulator / SDK)       |
-| Xcode            | 15+ (macOS only, for iOS)         |
-| React Native CLI | via `@react-native-community/cli` |
-
----
-
-## Setup
-
-### 1. Clone the repo
+You'll need Node 20+, JDK 17+, and Android Studio (or Xcode on Mac) set up before running the app.
 
 ```bash
 git clone https://github.com/ajaycnv/premiere-night.git
 cd premiere-night
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
 ```
 
-### 3. Add your TMDb API key
-
-Create a `config.ts` file in `src/`:
+**Add your TMDb API key** — create `src/config.ts`:
 
 ```ts
-// src/config.ts
 export const TMDB_API_KEY = 'your_api_key_here';
 ```
 
 Get a free key at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api).
 
-### 4. Install iOS pods (macOS only)
+**iOS only:**
 
 ```bash
 cd ios && pod install && cd ..
@@ -50,187 +32,109 @@ cd ios && pod install && cd ..
 
 ---
 
-## Running the App
-
-### Android
+## Running
 
 ```bash
 npm run android
-```
-
-### iOS (macOS only)
-
-```bash
 npm run ios
-```
-
-### Start Metro bundler only
-
-```bash
-npm run start
-```
-
----
-
-## Live Build
-
-> [View on Appetize.io](#) ← link to be added after build upload
-
----
-
-## Scripts
-
-```bash
-npm run android       # run on Android
-npm run ios           # run on iOS
-npm run start         # start Metro bundler
-npm test              # run Jest tests
-npm run lint          # lint src/
-npm run lint:fix      # lint and auto-fix
+npm run start       # Metro only
+npm test
+npm run lint
+npm run lint:fix
 ```
 
 ---
 
 ## Stack
 
-| Concern        | Library                                       | Version |
-| -------------- | --------------------------------------------- | ------- |
-| Framework      | React Native CLI                              | 0.81.5  |
-| Navigation     | React Navigation (Native Stack + Bottom Tabs) | 7.x     |
-| State          | Zustand                                       | 5.x     |
-| Storage        | react-native-mmkv                             | 4.x     |
-| Network status | @react-native-community/netinfo               | 12.x    |
-| Icons          | react-native-vector-icons                     | 10.x    |
-| Toast          | react-native-toast-message                    | 2.x     |
-| API            | TMDb REST API                                 | v3      |
+|            |                                               |
+| ---------- | --------------------------------------------- |
+| Framework  | React Native 0.81.5 (bare CLI)                |
+| Navigation | React Navigation — Native Stack + Bottom Tabs |
+| State      | Zustand 5                                     |
+| Storage    | react-native-mmkv                             |
+| API        | TMDb REST v3                                  |
+| Icons      | react-native-vector-icons                     |
+| Network    | @react-native-community/netinfo               |
+| Toast      | react-native-toast-message                    |
 
 ---
 
-## Architecture Decisions
+## Architecture Notes
 
-### Bare React Native CLI over Expo
+**Single FlatList over SectionList**
 
-Expo managed workflow introduced native module incompatibilities during the build process (`@react-native-async-storage` failing on Gradle 9, EAS build failures). Bare CLI gives full control over native config and avoids managed workflow constraints — more representative of a production codebase.
+The home screen renders a `Section[]` array from a pure `buildSections()` function, each section being a horizontal scroll. I looked at `SectionList` but it doesn't compose well here — the sections have different data sources, different loading states, and one of them is conditional (genre filter). With `buildSections`, adding a new section is just pushing an object into an array.
 
-### Config-driven sections with a single FlatList over SectionList
+**useReducer in useHomeScreen**
 
-The home screen uses a `buildSections()` pure function that returns a typed `Section[]` array, rendered by a single outer `FlatList`. Each section is itself a horizontal `AppFlatList`.
+Started with individual `useState` calls and it got messy fast — loading and error flags going out of sync, hard to trace what triggered what. Moved everything into a reducer with named actions. Easier to follow, easier to test, and all the fetching logic lives in `useHomeScreen` so `HomeScreen.tsx` stays clean.
 
-`SectionList` was considered but ruled out because:
+**MMKV over AsyncStorage**
 
-- Our sections are fundamentally different data sources (`nowPlaying`, `popular`, `genre`) — not grouped data of the same type
-- Each section needs independent `isLoading`, `isError`, `orientation`, and `size` config — `SectionList` doesn't support per-section loading states natively
-- Composing horizontal lists inside `SectionList` adds constraints with no benefit
-- Adding a new section is one object in the `buildSections` array — no new JSX required
+MMKV reads synchronously via JSI — no async overhead for something as simple as a watchlist. It also has no size limits and plugs straight into Zustand's `persist` middleware with a small adapter. AsyncStorage would have worked but felt like the wrong tool.
 
-### `useReducer` over multiple `useState`s
+**Zustand over Redux**
 
-HomeScreen originally had 9 separate `useState` calls. Consolidated into a single `useReducer` with explicit named actions (`LOAD_SUCCESS`, `LOAD_ERROR` etc.) to:
+Redux felt like overkill for one store with a handful of actions. Zustand gives you the same persistence and selector patterns without the boilerplate.
 
-- Prevent inconsistent intermediate states (e.g. `loading: false` while data is still empty)
-- Make every state transition traceable and testable in isolation
-- Keep all data-fetching logic out of the component in a custom `useHomeScreen` hook
+**Error handling**
 
-### MMKV over AsyncStorage
+Errors are handled at three levels: `httpClient.ts` throws a typed `ApiError`, screens catch and show inline error states for primary content, and toast messages handle background failures. `ErrorBoundary` wraps the navigator as a last resort. `NetworkBanner` sits outside `SafeAreaView` and slides in when the device goes offline.
 
-`@react-native-async-storage/async-storage` failed to resolve its native dependency (`org.asyncstorage.shared_storage`) on Gradle 9 during the EAS build. MMKV was chosen as the replacement because:
+**AbortController**
 
-- ~30x faster than AsyncStorage (C++ JSI, synchronous reads)
-- No size limits (AsyncStorage has per-item limits, SecureStore has a 2KB limit)
-- First-class Zustand `persist` middleware support via a simple adapter
-- Battle-tested in production React Native apps
-
-### Zustand over Redux
-
-For a project of this scope, Redux introduces unnecessary boilerplate. Zustand provides:
-
-- Zero boilerplate store setup
-- Built-in `persist` middleware for MMKV integration
-- Minimal re-renders via selector subscriptions
-- Simple API that's easy to follow in a code review
-
-### Request cancellation with AbortController
-
-`DetailScreen` creates an `AbortController` on mount and cancels the in-flight TMDb detail request on unmount. This prevents state updates on unmounted components when the user navigates away quickly — a common source of React warnings and subtle memory leaks.
-
-### Centralised error handling
-
-- A custom `httpClient.ts` wraps `fetch` with a typed `ApiError` class and centralised response handling
-- `react-native-toast-message` surfaces API failures as non-blocking toasts
-- `ErrorBoundary` (class component — required, as hooks cannot catch render errors) wraps the navigator for unexpected crashes
-- `NetworkBanner` listens to `@react-native-community/netinfo` and renders an animated overlay when the device goes offline — one place, covers the whole app
-
-### Typography system
-
-A single `<Typography variant="..." />` component replaces all raw `<Text>` usage. Variants (`heading`, `title`, `body`, `caption`) are defined once with consistent sizing, weight, and letter-spacing. `StyleSheet.create<Record<TypographyVariant, TextStyle>>` ensures TypeScript errors if a variant is declared but not styled.
-
-### Shared component library
-
-Reusable components extracted to `src/components/`:
-
-- `AppFlatList` — wraps FlatList with loading, error, empty, and pull-to-refresh states
-- `AppTextInput` — label, left/right icons, focused/error/disabled visual states
-- `Pill` — shared between `GenreFilter` (interactive, active state) and `DetailScreen` (decorative metadata chips)
-- `ScreenContainer` — `SafeAreaView` + `StatusBar` in one place
-- `NetworkBanner` — global offline indicator
+Only applied in `DetailScreen` — it cancels the in-flight request if the user navigates away before it completes. Search uses a 400ms debounce so abort would be redundant there.
 
 ---
 
 ## Deep Linking
 
-The app supports deep linking via the `premierenight://` scheme.
+Scheme: `premierenight://`
 
-| URL                         | Destination                |
-| --------------------------- | -------------------------- |
-| `premierenight://home`      | Home tab                   |
-| `premierenight://watchlist` | Watchlist tab              |
-| `premierenight://movie/:id` | Detail screen for movie ID |
-
-**Test on Android:**
+| URL                         | Opens         |
+| --------------------------- | ------------- |
+| `premierenight://home`      | Home tab      |
+| `premierenight://watchlist` | Watchlist tab |
+| `premierenight://movie/:id` | Detail screen |
 
 ```bash
+# Android
 adb shell am start -W -a android.intent.action.VIEW -d "premierenight://movie/550" com.premierenight
-```
 
-**Test on iOS:**
-
-```bash
+# iOS
 xcrun simctl openurl booted "premierenight://movie/550"
 ```
 
 ---
 
-## Testing
+## Tests
 
 ```bash
 npm test
 ```
 
-Tests cover pure functions with no UI dependencies:
+Covers the two pure functions that drive most of the home screen logic:
 
-- `buildSections.test.ts` — all section combinations (default, searching, genre filter, loading, error states)
+- `buildSections.test.ts` — all section combinations including search, genre filter, loading and error states
 - `homeReducer.test.ts` — every reducer action
 
 ---
 
-## Known Trade-offs & Future Improvements
+## What I'd improve with more time
 
-- **No pagination** — carousels are capped at 15 items. Full pagination via `onEndReached` + page state would be straightforward to add.
-- **No offline cache** — React Query would add request caching, background refetch, and automatic `AbortSignal` injection with minimal code changes.
-- **Backdrop image size** — fetched at `w1280` regardless of screen size. Could be optimised with responsive size selection.
-- **Search scope** — searches the full TMDb catalogue, not just the loaded carousels. This is intentional and a better UX.
+- **Pagination** — carousels currently cap at 15 items, `onEndReached` + page tracking would be straightforward to add
+- **React Query** — `useHomeScreen` manages loading/error/refresh manually via `useReducer`; swapping to `@tanstack/query` would simplify it to a few `useQuery` calls and add caching for free
+- **Image sizing** — backdrop images are fetched at `w1280` regardless of screen size
 
 ---
 
-## AI Tool Usage
+## AI Usage
 
-Claude (Anthropic) assisted with:
+Claude (Anthropic) helped with:
 
-- Initial project scaffolding and navigation boilerplate
-- Zustand persist middleware adapter setup
-- Unit test generation for `buildSections` and `homeReducer`
-- README structure and wording
+- Initial scaffolding and navigation boilerplate
+- Test suite for `buildSections` and `homeReducer`
+- Parts of this README
 
-All architectural decisions were made independently — the config-driven section approach, `useReducer` consolidation, MMKV selection, `AbortController` usage, component extraction strategy, and folder structure.
-
-Note on testing: Our current team operates with a dedicated QA function, so day-to-day test writing is not part of my recent workflow. AI was used to generate the test suite; each test case was reviewed and validated manually against the actual function behaviour.
+All architectural decisions were my own. Everything the AI produced was reviewed and adjusted before committing.
