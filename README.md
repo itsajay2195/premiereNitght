@@ -11,7 +11,7 @@ A film discovery app for Mytheresa's internal screening curation. Browse now-pla
 You'll need Node 20+, JDK 17+, and Android Studio (or Xcode on Mac) set up before running the app.
 
 ```bash
-git clone https://github.com/ajaycnv/premiere-night.git
+git clone https://github.com/itsajay2195/premiereNight.git
 cd premiere-night
 npm install
 ```
