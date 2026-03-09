@@ -1,7 +1,7 @@
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Colors } from '../../theme/theme';
-import { AppTextInput } from '../AppTextInput/AppTextInput';
+import { Colors } from '../theme/theme';
+import { AppTextInput } from './AppTextInput';
 
 interface Props {
   value: string;

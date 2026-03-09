@@ -7,8 +7,8 @@ import {
   StyleSheet,
   RefreshControl,
 } from 'react-native';
-import { Colors, Spacing } from '../../theme/theme';
-import { Typography } from '../Typography';
+import { Colors, Spacing } from '../theme/theme';
+import { Typography } from './Typography';
 
 interface AppFlatListProps<T> extends Omit<FlatListProps<T>, 'horizontal'> {
   isLoading?: boolean;

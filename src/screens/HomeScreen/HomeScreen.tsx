@@ -4,13 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import { Movie } from '../../api/types/movie';
 import { Typography } from '../../components/Typography';
 import { Colors, Spacing } from '../../theme/theme';
-import { AppFlatList } from '../../components/AppFlatlist/AppFlatList';
 import { MovieCard } from './components/MovieCard';
 import ListHeader from './components/ListHeader';
 import { useHomeScreen } from './state/useHomeScreen';
 import { buildSections } from './state/buildSections';
 import { Section } from './type';
 import { DETAILS_SCREEN } from '../../constants/screenConstants';
+import { AppFlatList } from '../../components/AppFlatList';
 
 function HomeScreen() {
   const navigation = useNavigation<any>();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
-import { Colors, Radius, Spacing } from '../../theme/theme';
-import { Typography } from '../Typography/Typography';
+import { Typography } from './Typography';
+import { Colors, Radius, Spacing } from '../theme/theme';
 
 interface PillProps {
   label: string;

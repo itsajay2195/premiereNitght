@@ -2,8 +2,8 @@ import React, { useCallback } from 'react';
 import { StyleSheet } from 'react-native';
 import { Genre } from '../../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../../theme/theme';
-import { AppFlatList } from '../../../components/AppFlatlist/AppFlatList';
-import { Pill } from '../../../components/Pill/Pill';
+import { Pill } from '../../../components/Pill';
+import { AppFlatList } from '../../../components/AppFlatList';
 
 interface Props {
   genres: Genre[];

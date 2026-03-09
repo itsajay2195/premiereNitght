@@ -13,7 +13,7 @@ import { Movie } from '../../api/types/movie';
 import { Colors, Radius, Spacing } from '../../theme/theme';
 import { getPosterUrl } from '../../utils/imageUtils';
 import { DETAILS_SCREEN } from '../../constants/screenConstants';
-import { Typography } from '../../components/Typography/Typography';
+import { Typography } from '../../components/Typography';
 
 type Nav = NativeStackNavigationProp<any>;
 
