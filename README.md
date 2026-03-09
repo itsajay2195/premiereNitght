@@ -1,6 +1,6 @@
 # Première Night 🎬
 
-A film discovery app for Mytheresa's internal screening curation. Browse now-playing and popular titles, filter by genre, search the TMDb catalogue, and build a watchlist — all in a dark, editorial UI.
+A film discovery app for Mytheresa's internal screening curation. Browse now-playing and popular titles, filter by genre, search the TMDb catalogue, and build a watchlist all in a dark, editorial UI.
 
 [View on Appetize.io](https://appetize.io/app/b_4m5xnr74zil3yxngynw2rbtgda)
 
@@ -61,6 +61,8 @@ npm run lint:fix
 ---
 
 ## Architecture Notes
+
+This is a bare react-native app.
 
 **Single FlatList over SectionList**
 
